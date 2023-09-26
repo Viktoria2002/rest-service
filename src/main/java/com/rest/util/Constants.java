@@ -86,4 +86,18 @@ public final class Constants {
             throw new UnsupportedOperationException(UNSUPPORTED_OPERATION_EXCEPTION_MESSAGE);
         }
     }
+
+    public static final class TestDatabaseSetup {
+        public static final String DOCKER_IMAGE_NAME = "postgres:latest";
+        public static final String DATABASE_NAME = "shop";
+        public static final String USERNAME = "user";
+        public static final String PASSWORD = "pass";
+        public static final String DATA_SOURCE_FIELD = "dataSource";
+        public static final String INIT_TEST_DB_PATH = "src/test/resources/db/inserts.sql";
+        public static final String CLEAR_TEST_DB_PATH = "src/test/resources/db/clear.sql";
+
+        private TestDatabaseSetup() {
+            throw new UnsupportedOperationException(UNSUPPORTED_OPERATION_EXCEPTION_MESSAGE);
+        }
+    }
 }
