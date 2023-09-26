@@ -66,6 +66,8 @@ public final class Constants {
     }
 
     public static final class ExceptionMessages {
+        public static final String READER_EXCEPTION_MESSAGE = "Error reading from stream: ";
+        public static final String WRITER_EXCEPTION_MESSAGE = "Error writing JSON string: ";
         public static final String SQL_EXCEPTION_MESSAGE = "Error working with database: ";
         public static final String UNSUPPORTED_OPERATION_EXCEPTION_MESSAGE = "This is a utility class and cannot be instantiated";
         public static final String LOAD_CONFIG_FILE_EXCEPTION_MESSAGE = "Error loading configuration file: ";
@@ -97,6 +99,15 @@ public final class Constants {
         public static final String CLEAR_TEST_DB_PATH = "src/test/resources/db/clear.sql";
 
         private TestDatabaseSetup() {
+            throw new UnsupportedOperationException(UNSUPPORTED_OPERATION_EXCEPTION_MESSAGE);
+        }
+    }
+
+    public static final class OutputProperties {
+        public static final String CONTENT_TYPE = "application/json";
+        public static final String ENCODING = "UTF-8";
+
+        private OutputProperties() {
             throw new UnsupportedOperationException(UNSUPPORTED_OPERATION_EXCEPTION_MESSAGE);
         }
     }
