@@ -1,0 +1,5 @@
+database:
+  database.url: jdbc:postgresql://localhost:5432/rest_service?currentSchema=shop
+  database.username: postgres
+  database.password: root1234
+  database.driver: org.postgresql.Driver
