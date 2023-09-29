@@ -9,7 +9,7 @@ import static com.rest.util.Constants.DatabaseSetup.*;
 import static com.rest.util.Constants.ExceptionMessages.UNSUPPORTED_OPERATION_EXCEPTION_MESSAGE;
 
 public class ConnectionManager {
-    private static HikariDataSource dataSource;
+    protected static HikariDataSource dataSource;
 
     private ConnectionManager() {
         throw new UnsupportedOperationException(UNSUPPORTED_OPERATION_EXCEPTION_MESSAGE);
@@ -27,6 +27,10 @@ public class ConnectionManager {
 
     public static Connection getConnection() throws SQLException {
         return dataSource.getConnection();
+    }
+
+    public static void setDataSource(HikariDataSource dataSource) {
+        ConnectionManager.dataSource = dataSource;
     }
 
     public static void closeConnectionPool() {

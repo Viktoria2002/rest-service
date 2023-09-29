@@ -1,32 +1,31 @@
 package com.rest.repository;
 
 import com.rest.db.ConnectionManager;
+import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.testcontainers.containers.PostgreSQLContainer;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import static com.rest.util.Constants.TestDatabaseSetup.*;
 
+@ExtendWith(MockitoExtension.class)
 public class AbstractTest {
     protected static PostgreSQLContainer<?> POSTGRESQL_CONTAINER;
-    private static String jdbcUrl;
-    private static String username;
-    private static String password;
 
     @BeforeAll
-    public static void setUp() throws NoSuchFieldException, IllegalAccessException {
+    public static void setUp() {
         POSTGRESQL_CONTAINER = new PostgreSQLContainer<>(DOCKER_IMAGE_NAME)
                 .withDatabaseName(DATABASE_NAME)
                 .withUsername(USERNAME)
@@ -38,12 +37,12 @@ public class AbstractTest {
 
     @BeforeEach
     public void init() throws SQLException, IOException {
-        initializeTestContainer(jdbcUrl, username, password, INIT_TEST_DB_PATH);
+        initializeTestContainer(INIT_TEST_DB_PATH);
     }
 
     @AfterEach
     public void clear() throws SQLException, IOException {
-        initializeTestContainer(jdbcUrl, username, password, CLEAR_TEST_DB_PATH);
+        initializeTestContainer(CLEAR_TEST_DB_PATH);
     }
 
     @AfterAll
@@ -51,23 +50,17 @@ public class AbstractTest {
         POSTGRESQL_CONTAINER.stop();
     }
 
-    private static void setDataSource() throws NoSuchFieldException, IllegalAccessException {
-        jdbcUrl = POSTGRESQL_CONTAINER.getJdbcUrl();
-        username = POSTGRESQL_CONTAINER.getUsername();
-        password = POSTGRESQL_CONTAINER.getPassword();
-
-        Field privateField = ConnectionManager.class.getDeclaredField(DATA_SOURCE_FIELD);
-        privateField.setAccessible(true);
-
-        HikariDataSource dataSource = (HikariDataSource) privateField.get(ConnectionManager.class);
-        dataSource.setJdbcUrl(jdbcUrl);
-        dataSource.setUsername(username);
-        dataSource.setPassword(password);
+    private static void setDataSource() {
+        HikariConfig config = new HikariConfig();
+        config.setJdbcUrl(POSTGRESQL_CONTAINER.getJdbcUrl());
+        config.setUsername(POSTGRESQL_CONTAINER.getUsername());
+        config.setPassword(POSTGRESQL_CONTAINER.getPassword());
+        ConnectionManager.setDataSource(new HikariDataSource(config));
     }
 
-    private void initializeTestContainer(String jdbcUrl, String username, String password, String file) throws SQLException, IOException {
+    private void initializeTestContainer(String file) throws SQLException, IOException {
         String query = "";
-        try (Connection connection = DriverManager.getConnection(jdbcUrl, username, password);
+        try (Connection connection = ConnectionManager.getConnection();
              BufferedReader br = new BufferedReader(new FileReader(file))) {
             String line;
             while ((line = br.readLine()) != null) {
